@@ -264,7 +264,7 @@ namespace Microsoft.Health.Fhir.Core.Features.Operations.Reindex
                     }
 
                     var averageDbConsumption = _throttleController.UpdateDatastoreUsage();
-                    _logger.LogInformation($"Reindex avaerage DB consumption: {averageDbConsumption}");
+                    _logger.LogInformation($"Reindex average DB consumption: {averageDbConsumption}");
                     var throttleDelayTime = _throttleController.GetThrottleBasedDelay();
                     _logger.LogInformation($"Reindex throttle delay: {throttleDelayTime}");
                     await Task.Delay(_reindexJobRecord.QueryDelayIntervalInMilliseconds + throttleDelayTime);
@@ -283,15 +283,34 @@ namespace Microsoft.Health.Fhir.Core.Features.Operations.Reindex
                         }
                     }
 
-                    // if our received CancellationToken is cancelled we should
+                    // Get the latest version of the reindex job in case another thread has updated it
+                    await jobSemaphore.WaitAsync();
+                    try
+                    {
+                        using (IScoped<IFhirOperationDataStore> store = _fhirOperationDataStoreFactory())
+                        {
+                            var wrapper = await store.Value.GetReindexJobByIdAsync(_reindexJobRecord.Id, cancellationToken);
+                            _weakETag = wrapper.ETag;
+                            _reindexJobRecord = wrapper.JobRecord;
+                        }
+                    }
+                    finally
+                    {
+                        jobSemaphore.Release();
+                    }
+
+                    // if our received CancellationToken is cancelled, or the job has been marked canceled we should
                     // pass that cancellation request onto all the cancellationTokens
                     // for the currently executing threads
-                    if (cancellationToken.IsCancellationRequested)
+                    if (cancellationToken.IsCancellationRequested || _reindexJobRecord.Status == OperationStatus.Canceled)
                     {
                         foreach (var tokenSource in queryCancellationTokens.Values)
                         {
                             tokenSource.Cancel(false);
                         }
+
+                        _logger.LogInformation("Reindex Job canceled.");
+                        throw new OperationCanceledException("ReindexJob canceled.");
                     }
                 }
 
@@ -311,6 +330,11 @@ namespace Microsoft.Health.Fhir.Core.Features.Operations.Reindex
             {
                 // The reindex job was updated externally.
                 _logger.LogInformation("The job was updated by another process.");
+            }
+            catch (OperationCanceledException)
+            {
+                // do nothing just throw
+                throw;
             }
             catch (Exception ex)
             {
