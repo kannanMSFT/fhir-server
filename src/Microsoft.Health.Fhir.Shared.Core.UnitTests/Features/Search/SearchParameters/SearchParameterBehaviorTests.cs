@@ -85,7 +85,7 @@ namespace Microsoft.Health.Fhir.Core.UnitTests.Features.Search
 
             _fhirDataStore.GetAsync(key, Arg.Any<CancellationToken>()).Returns(wrapper);
 
-            var response = new DeleteResourceResponse(key);
+            var response = new DeleteResourceResponse(key, 1);
 
             var behavior = new DeleteSearchParameterBehavior<DeleteResourceRequest, DeleteResourceResponse>(_searchParameterOperations, _fhirDataStore);
             await behavior.Handle(request, CancellationToken.None, async () => await Task.Run(() => response));
@@ -106,7 +106,7 @@ namespace Microsoft.Health.Fhir.Core.UnitTests.Features.Search
 
             _fhirDataStore.GetAsync(key, Arg.Any<CancellationToken>()).Returns(wrapper);
 
-            var response = new DeleteResourceResponse(key);
+            var response = new DeleteResourceResponse(key, 1);
 
             var behavior = new DeleteSearchParameterBehavior<DeleteResourceRequest, DeleteResourceResponse>(_searchParameterOperations, _fhirDataStore);
             await behavior.Handle(request, CancellationToken.None, async () => await Task.Run(() => response));
@@ -126,7 +126,7 @@ namespace Microsoft.Health.Fhir.Core.UnitTests.Features.Search
 
             _fhirDataStore.GetAsync(key, Arg.Any<CancellationToken>()).Returns(wrapper);
 
-            var response = new DeleteResourceResponse(key);
+            var response = new DeleteResourceResponse(key, 1);
 
             var behavior = new DeleteSearchParameterBehavior<DeleteResourceRequest, DeleteResourceResponse>(_searchParameterOperations, _fhirDataStore);
             await behavior.Handle(request, CancellationToken.None, async () => await Task.Run(() => response));

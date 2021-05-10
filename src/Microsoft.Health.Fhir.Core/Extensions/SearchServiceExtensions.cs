@@ -21,7 +21,12 @@ namespace Microsoft.Health.Fhir.Core.Extensions
         /// "If-Exists" headers on the API. Additional logic is used to filter parameters that don't restrict
         /// results, and also ensure that the query meets criteria requirements
         /// </summary>
-        public static async Task<IReadOnlyCollection<SearchResultEntry>> ConditionalSearchAsync(this ISearchService searchService, string instanceType, IReadOnlyList<Tuple<string, string>> conditionalParameters, CancellationToken cancellationToken)
+        public static async Task<(IReadOnlyCollection<SearchResultEntry> results, string continuationToken)> ConditionalSearchAsync(
+            this ISearchService searchService,
+            string instanceType,
+            IReadOnlyList<Tuple<string, string>> conditionalParameters,
+            CancellationToken cancellationToken,
+            IReadOnlyList<Tuple<string, string>> systemParameters = null)
         {
             // Filters search parameters that can limit the number of results (e.g. _count=1)
             IReadOnlyList<Tuple<string, string>> filteredParameters = conditionalParameters
@@ -29,7 +34,7 @@ namespace Microsoft.Health.Fhir.Core.Extensions
                             && !string.Equals(x.Item1, KnownQueryParameterNames.Summary, StringComparison.OrdinalIgnoreCase))
                 .ToArray();
 
-            SearchResult results = await searchService.SearchAsync(instanceType, filteredParameters, cancellationToken);
+            SearchResult results = await searchService.SearchAsync(instanceType, filteredParameters.Concat(systemParameters ?? Array.Empty<Tuple<string, string>>()).ToArray(), cancellationToken);
 
             // Check if all parameters passed in were unused, this would result in no search parameters being applied to search results
             int? totalUnusedParameters = results?.UnsupportedSearchParameters.Count;
@@ -40,7 +45,7 @@ namespace Microsoft.Health.Fhir.Core.Extensions
 
             SearchResultEntry[] matchedResults = results?.Results.Where(x => x.SearchEntryMode == ValueSets.SearchEntryMode.Match).ToArray();
 
-            return matchedResults;
+            return (matchedResults, results?.ContinuationToken);
         }
     }
 }

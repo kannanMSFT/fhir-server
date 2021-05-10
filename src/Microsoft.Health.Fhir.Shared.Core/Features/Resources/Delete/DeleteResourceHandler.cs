@@ -74,10 +74,10 @@ namespace Microsoft.Health.Fhir.Core.Features.Resources.Delete
 
             if (string.IsNullOrWhiteSpace(version))
             {
-                return new DeleteResourceResponse(new ResourceKey(key.ResourceType, key.Id));
+                return new DeleteResourceResponse(new ResourceKey(key.ResourceType, key.Id), 1);
             }
 
-            return new DeleteResourceResponse(new ResourceKey(key.ResourceType, key.Id, version), WeakETag.FromVersionId(version));
+            return new DeleteResourceResponse(new ResourceKey(key.ResourceType, key.Id, version), 1, WeakETag.FromVersionId(version));
         }
     }
 }

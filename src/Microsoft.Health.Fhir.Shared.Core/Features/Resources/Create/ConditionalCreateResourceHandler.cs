@@ -53,7 +53,7 @@ namespace Microsoft.Health.Fhir.Core.Features.Resources.Create
                 throw new UnauthorizedFhirActionException();
             }
 
-            IReadOnlyCollection<SearchResultEntry> matchedResults = await _searchService.ConditionalSearchAsync(request.Resource.InstanceType, request.ConditionalParameters, cancellationToken);
+            (IReadOnlyCollection<SearchResultEntry> matchedResults, string ct) = await _searchService.ConditionalSearchAsync(request.Resource.InstanceType, request.ConditionalParameters, cancellationToken);
 
             int count = matchedResults.Count;
             if (count == 0)

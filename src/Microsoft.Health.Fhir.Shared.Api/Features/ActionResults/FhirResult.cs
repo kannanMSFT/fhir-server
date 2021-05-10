@@ -48,6 +48,17 @@ namespace Microsoft.Health.Fhir.Api.Features.ActionResults
         }
 
         /// <summary>
+        /// Returns an Accepted response
+        /// </summary>
+        public static FhirResult Accepted()
+        {
+            return new FhirResult
+            {
+                StatusCode = HttpStatusCode.Accepted,
+            };
+        }
+
+        /// <summary>
         /// Creates a Gone response
         /// </summary>
         public static FhirResult Gone()
