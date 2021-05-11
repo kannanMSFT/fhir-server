@@ -144,6 +144,9 @@ namespace Microsoft.Health.Fhir.Api.Controllers
                 case OperationsConstants.MemberMatch:
                     operationEnabled = true;
                     break;
+                case OperationsConstants.PublishEvents:
+                    operationEnabled = _operationConfiguration.PublishEvents.Enabled;
+                    break;
                 default:
                     break;
             }

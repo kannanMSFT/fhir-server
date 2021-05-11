@@ -22,6 +22,7 @@ using Microsoft.Health.Fhir.Api.Features.Context;
 using Microsoft.Health.Fhir.Api.Features.ExceptionNotifications;
 using Microsoft.Health.Fhir.Api.Features.Exceptions;
 using Microsoft.Health.Fhir.Api.Features.Operations.Export;
+using Microsoft.Health.Fhir.Api.Features.Operations.PublishEvents;
 using Microsoft.Health.Fhir.Api.Features.Operations.Reindex;
 using Microsoft.Health.Fhir.Api.Features.Routing;
 using Microsoft.Health.Fhir.Api.Features.Throttling;
@@ -75,6 +76,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton(Options.Options.Create(fhirServerConfiguration.Audit));
             services.AddSingleton(Options.Options.Create(fhirServerConfiguration.Bundle));
             services.AddSingleton(Options.Options.Create(fhirServerConfiguration.Throttling));
+            services.AddSingleton(Options.Options.Create(fhirServerConfiguration.Operations.PublishEvents));
             services.AddTransient<IStartupFilter, FhirServerStartupFilter>();
 
             services.RegisterAssemblyModules(Assembly.GetExecutingAssembly(), fhirServerConfiguration);
@@ -114,6 +116,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             fhirServerBuilder.Services.AddHostedService<ExportJobWorkerBackgroundService>();
             fhirServerBuilder.Services.AddHostedService<ReindexJobWorkerBackgroundService>();
+            fhirServerBuilder.Services.AddHostedService<PublishEventsBackgroundService>();
 
             return fhirServerBuilder;
         }
