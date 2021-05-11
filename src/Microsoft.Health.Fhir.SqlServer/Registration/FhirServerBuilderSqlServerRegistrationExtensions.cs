@@ -8,8 +8,10 @@ using System.Linq;
 using EnsureThat;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Health.Extensions.DependencyInjection;
+using Microsoft.Health.Fhir.Core.Features.Operations.PublishEvents;
 using Microsoft.Health.Fhir.Core.Features.Search.Registry;
 using Microsoft.Health.Fhir.Core.Registration;
+using Microsoft.Health.Fhir.SqlServer.Features.ChangeFeed;
 using Microsoft.Health.Fhir.SqlServer.Features.Operations.Reindex;
 using Microsoft.Health.Fhir.SqlServer.Features.Schema;
 using Microsoft.Health.Fhir.SqlServer.Features.Search;
@@ -49,6 +51,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 .Singleton()
                 .AsSelf();
 
+            // TODO: Revisit the scoping.
+            services.Add<PublishEventsWorker>()
+                .Singleton()
+                .AsSelf()
+                .AsImplementedInterfaces();
+
             services.Add<SqlServerFhirDataStore>()
                 .Scoped()
                 .AsSelf()
@@ -56,6 +64,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.Add<SqlServerFhirOperationDataStore>()
                 .Scoped()
+                .AsSelf()
+                .AsImplementedInterfaces();
+
+            // TODO: Revisit the scoping.
+            services.Add<SqlResourceChangeDataReadOnlyDataStore>()
+                .Singleton()
                 .AsSelf()
                 .AsImplementedInterfaces();
 

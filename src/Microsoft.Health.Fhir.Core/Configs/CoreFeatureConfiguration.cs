@@ -51,5 +51,10 @@ namespace Microsoft.Health.Fhir.Core.Configs
         /// Gets or sets a value whether we need to run profile validation during resource update.
         /// </summary>
         public bool ProfileValidationOnUpdate { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets a value whether capturing resource change data is enabled or not.
+        /// </summary>
+        public bool SupportsEvent { get; set; } = false;
     }
 }
