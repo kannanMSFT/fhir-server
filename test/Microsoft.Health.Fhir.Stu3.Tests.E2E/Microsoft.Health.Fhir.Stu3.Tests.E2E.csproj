@@ -20,7 +20,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="$(AspNetPackageVersion)" />
     <PackageReference Include="Microsoft.Azure.ContainerRegistry" Version="1.0.0-preview.1" />
-    <PackageReference Include="Microsoft.Health.Extensions.DependencyInjection" Version="2.1.26-alpha" />
+    <PackageReference Include="Microsoft.Health.Extensions.DependencyInjection" Version="$(HealthcareSharedPackageVersion)" />
     <PackageReference Include="Microsoft.Health.Test.Utilities" Version="$(HealthcareSharedPackageVersion)" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
     <PackageReference Include="selenium.webdriver" Version="3.141.0" />

@@ -7,8 +7,10 @@ using System;
 using System.Linq;
 using EnsureThat;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Health.Abstractions.Data;
 using Microsoft.Health.Extensions.DependencyInjection;
 using Microsoft.Health.Fhir.Core.Features.Search.Registry;
+using Microsoft.Health.Fhir.Core.Models;
 using Microsoft.Health.Fhir.Core.Registration;
 using Microsoft.Health.Fhir.SqlServer.Features.Operations.Reindex;
 using Microsoft.Health.Fhir.SqlServer.Features.Schema;
@@ -108,6 +110,10 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AsImplementedInterfaces();
 
             services.Add<ReindexJobSqlThrottlingController>()
+                .Singleton()
+                .AsImplementedInterfaces();
+
+            services.Add<ISource<IResourceChangeData>>()
                 .Singleton()
                 .AsImplementedInterfaces();
 
