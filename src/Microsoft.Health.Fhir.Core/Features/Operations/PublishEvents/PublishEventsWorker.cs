@@ -16,22 +16,22 @@ namespace Microsoft.Health.Fhir.Core.Features.Operations.PublishEvents
 {
     public class PublishEventsWorker : IPublishEventsWorker
     {
-        private readonly ISource<IResourceChangeData> _fhirChangeFeedStore;
+        private readonly ISource<IResourceChangeData> _fhirResourcesChangeFeedStore;
         private readonly PublishEventsConfiguration _publishEventsConfiguration;
         private readonly ILogger _logger;
 
         /// <summary>
         /// Publish Events Job worker.
         /// </summary>
-        /// <param name="fhirChangeFeedStore">Data Store</param>
+        /// <param name="fhirResourcesChangeFeedStore">Data Store</param>
         /// <param name="publishEventsJobConfiguration">Configuration</param>
         /// <param name="logger">Logger</param>
         public PublishEventsWorker(
-            ISource<IResourceChangeData> fhirChangeFeedStore,
+            ISource<IResourceChangeData> fhirResourcesChangeFeedStore,
             IOptions<PublishEventsConfiguration> publishEventsJobConfiguration,
             ILogger<PublishEventsWorker> logger)
         {
-            _fhirChangeFeedStore = fhirChangeFeedStore;
+            _fhirResourcesChangeFeedStore = fhirResourcesChangeFeedStore;
             _publishEventsConfiguration = publishEventsJobConfiguration.Value;
             _logger = logger;
         }
