@@ -4,6 +4,7 @@
 // -------------------------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -38,13 +39,24 @@ namespace Microsoft.Health.Fhir.Core.Features.Operations.PublishEvents
 
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            int startIndex = 1;
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    // Query DB
-                    // Get records to publish
+                    // Query DB and get records to publish
+                    IReadOnlyCollection<IResourceChangeData> records =
+                        await _fhirResourcesChangeFeedStore.FetchRecordsAsync(startIndex, 25, 1000, cancellationToken);
+
                     // Publish events.
+                    int count = records.Count;
+                    _logger.LogInformation($@"Published {count} records by reading change feed ");
+
+                    // Update watermark.
+                    if (records.Count > 0)
+                    {
+                        startIndex += records.Count;
+                    }
 
                     await Task.Delay(_publishEventsConfiguration.JobPollingFrequency, cancellationToken);
                 }
