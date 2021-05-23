@@ -5,7 +5,7 @@
 
 using System;
 
-namespace Microsoft.Health.Fhir.SqlServer.Features.ChangeFeed.Model
+namespace Microsoft.Health.Fhir.Core.Models
 {
     public interface IResourceChangeData
     {

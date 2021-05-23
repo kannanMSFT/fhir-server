@@ -8,29 +8,30 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Health.Extensions.DependencyInjection;
+using Microsoft.Health.Abstractions.Data;
 using Microsoft.Health.Fhir.Core.Configs;
+using Microsoft.Health.Fhir.Core.Models;
 
 namespace Microsoft.Health.Fhir.Core.Features.Operations.PublishEvents
 {
     public class PublishEventsWorker : IPublishEventsWorker
     {
-        private readonly Func<IScoped<IFhirOperationDataStore>> _fhirOperationDataStoreFactory;
+        private readonly ISource<IResourceChangeData> _fhirChangeFeedStore;
         private readonly PublishEventsConfiguration _publishEventsConfiguration;
         private readonly ILogger _logger;
 
         /// <summary>
         /// Publish Events Job worker.
         /// </summary>
-        /// <param name="fhirOperationDataStoreFactory">Data Store</param>
+        /// <param name="fhirChangeFeedStore">Data Store</param>
         /// <param name="publishEventsJobConfiguration">Configuration</param>
         /// <param name="logger">Logger</param>
         public PublishEventsWorker(
-            Func<IScoped<IFhirOperationDataStore>> fhirOperationDataStoreFactory,
+            ISource<IResourceChangeData> fhirChangeFeedStore,
             IOptions<PublishEventsConfiguration> publishEventsJobConfiguration,
             ILogger<PublishEventsWorker> logger)
         {
-            _fhirOperationDataStoreFactory = fhirOperationDataStoreFactory;
+            _fhirChangeFeedStore = fhirChangeFeedStore;
             _publishEventsConfiguration = publishEventsJobConfiguration.Value;
             _logger = logger;
         }

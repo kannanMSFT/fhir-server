@@ -12,7 +12,7 @@ using EnsureThat;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Microsoft.Health.Abstractions.Data;
-using Microsoft.Health.Fhir.SqlServer.Features.ChangeFeed.Model;
+using Microsoft.Health.Fhir.Core.Models;
 using Microsoft.Health.SqlServer;
 
 namespace Microsoft.Health.Fhir.SqlServer.Features.ChangeFeed
