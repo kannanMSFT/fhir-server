@@ -5,11 +5,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Health.Abstractions.Data;
+using Microsoft.Health.Abstractions.Features.Events;
+using Microsoft.Health.Core.Features.Events;
 using Microsoft.Health.Fhir.Core.Configs;
 using Microsoft.Health.Fhir.Core.Models;
 
@@ -18,21 +21,25 @@ namespace Microsoft.Health.Fhir.Core.Features.Operations.PublishEvents
     public class PublishEventsWorker : IPublishEventsWorker
     {
         private readonly ISource<IResourceChangeData> _fhirResourcesChangeFeedStore;
+        private readonly ISink<IEvent> _eventSink;
         private readonly PublishEventsConfiguration _publishEventsConfiguration;
         private readonly ILogger _logger;
 
         /// <summary>
         /// Publish Events Job worker.
         /// </summary>
-        /// <param name="fhirResourcesChangeFeedStore">Data Store</param>
+        /// <param name="fhirResourcesChangeFeedStore">Source Data Store</param>
+        /// <param name="eventSink">Sink for the events to be written to.</param>
         /// <param name="publishEventsJobConfiguration">Configuration</param>
         /// <param name="logger">Logger</param>
         public PublishEventsWorker(
             ISource<IResourceChangeData> fhirResourcesChangeFeedStore,
+            ISink<IEvent> eventSink,
             IOptions<PublishEventsConfiguration> publishEventsJobConfiguration,
             ILogger<PublishEventsWorker> logger)
         {
             _fhirResourcesChangeFeedStore = fhirResourcesChangeFeedStore;
+            _eventSink = eventSink;
             _publishEventsConfiguration = publishEventsJobConfiguration.Value;
             _logger = logger;
         }
@@ -40,6 +47,11 @@ namespace Microsoft.Health.Fhir.Core.Features.Operations.PublishEvents
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             int startIndex = 1;
+            var resourceTypeIdMap = new Dictionary<short, string>
+            {
+                { 0, "Create" }, { 1, "Update" }, { 2, "Delete" },
+            };
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
@@ -49,6 +61,16 @@ namespace Microsoft.Health.Fhir.Core.Features.Operations.PublishEvents
                         await _fhirResourcesChangeFeedStore.FetchRecordsAsync(startIndex, 25, 1000, cancellationToken);
 
                     // Publish events.
+                    var events = records.Select(r => new EventData()
+                    {
+                        Subject = "Resource Change Feed",
+                        DataVersion = r.ResourceVersion.ToString(),
+                        EventType = resourceTypeIdMap[r.ResourceChangeTypeId],
+                        Data = new BinaryData(r),
+                    }).ToList();
+
+                    await _eventSink.WriteAsync(events);
+
                     int count = records.Count;
                     _logger.LogInformation($@"Published {count} records by reading change feed ");
 

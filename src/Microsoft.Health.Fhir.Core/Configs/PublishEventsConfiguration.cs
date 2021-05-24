@@ -15,5 +15,15 @@ namespace Microsoft.Health.Fhir.Core.Configs
         public bool Enabled { get; set; }
 
         public TimeSpan JobPollingFrequency { get; set; } = TimeSpan.FromSeconds(5);
+
+        /// <summary>
+        /// EventEndPoint.
+        /// </summary>
+        public string EventEndPoint { get; set; }
+
+        /// <summary>
+        /// Access key for event grid.
+        /// </summary>
+        public string AccessKey { get; set; }
     }
 }
