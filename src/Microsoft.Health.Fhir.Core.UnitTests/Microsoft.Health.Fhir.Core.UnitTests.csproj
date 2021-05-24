@@ -11,7 +11,7 @@
     <EmbeddedResource Include="TestFiles\ExportJobRecordV2.json" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Health.Test.Utilities" Version="2.1.26-beta" />
+    <PackageReference Include="Microsoft.Health.Test.Utilities" Version="$(HealthcareSharedPackageVersion)" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
     <PackageReference Include="NSubstitute" Version="4.2.2" />
     <PackageReference Include="xunit" Version="2.4.1" />
