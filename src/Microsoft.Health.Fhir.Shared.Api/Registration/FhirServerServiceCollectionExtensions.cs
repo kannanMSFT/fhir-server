@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using EnsureThat;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -86,7 +87,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingleton<ISink<IEvent>>(sp =>
                     new EventGridEventGenerator<IEvent>(
                         new Uri(fhirServerConfiguration.Operations.PublishEvents.EventEndPoint),
-                        fhirServerConfiguration.Operations.PublishEvents.AccessKey));
+                        new X509Certificate2($"{AppDomain.CurrentDomain.BaseDirectory}/{fhirServerConfiguration.Operations.PublishEvents.CertificateFileName}")));
 
             services.RegisterAssemblyModules(Assembly.GetExecutingAssembly(), fhirServerConfiguration);
 

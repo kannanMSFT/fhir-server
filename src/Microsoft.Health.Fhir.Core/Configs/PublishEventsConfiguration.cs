@@ -25,5 +25,20 @@ namespace Microsoft.Health.Fhir.Core.Configs
         /// Access key for event grid.
         /// </summary>
         public string AccessKey { get; set; }
+
+        /// <summary>
+        /// Certificate file name.
+        /// </summary>
+        public string CertificateFileName { get; set; }
+
+        /// <summary>
+        /// Fhir Account
+        /// </summary>
+        public string FhirAccount { get; set; }
+
+        /// <summary>
+        /// Event Grid Topic
+        /// </summary>
+        public string EventGridTopic { get; set; }
     }
 }
