@@ -59,7 +59,7 @@ namespace Microsoft.Health.Fhir.SqlServer.Features.ChangeFeed
                                 listResourceChangeData.Add(new ResourceChangeData
                                 {
                                     Id = (long)sqlDataReader["Id"],
-                                    Timestamp = (DateTime)sqlDataReader["Timestamp"],
+                                    Timestamp = DateTime.SpecifyKind((DateTime)sqlDataReader["Timestamp"], DateTimeKind.Utc),
                                     ResourceId = (string)sqlDataReader["ResourceId"],
                                     ResourceType = (string)sqlDataReader["ResourceType"],
                                     ResourceVersion = (int)sqlDataReader["ResourceVersion"],

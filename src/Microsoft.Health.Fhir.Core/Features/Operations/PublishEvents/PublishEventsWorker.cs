@@ -47,6 +47,12 @@ namespace Microsoft.Health.Fhir.Core.Features.Operations.PublishEvents
         public async Task ExecuteAsync(CancellationToken cancellationToken)
         {
             int startIndex = 1;
+            var resourceChangeTypeMap = new Dictionary<string, string>
+            {
+                { "Creation", "Microsoft.HealthcareApis.FhirResourceCreated" },
+                { "Update", "Microsoft.HealthcareApis.FhirResourceUpdated" },
+                { "Deletion", "Microsoft.HealthcareApis.FhirResourceDeleted" },
+            };
 
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -61,10 +67,19 @@ namespace Microsoft.Health.Fhir.Core.Features.Operations.PublishEvents
                         // Publish events.
                         var events = records.Select(r => new EventData()
                         {
-                            Subject = "Resource Change Feed",
+                            Topic = _publishEventsConfiguration.EventGridTopic,
+                            Subject = $"{_publishEventsConfiguration.FhirAccount}/{r.ResourceType}/{r.ResourceId}",
+                            EventType = resourceChangeTypeMap[r.ResourceChangeType],
+                            EventTime = r.Timestamp,
+                            Id = r.Id.ToString(),
                             DataVersion = r.ResourceVersion.ToString(),
-                            EventType = r.ResourceChangeType,
-                            Data = new BinaryData(r),
+                            Data = new BinaryData(new
+                            {
+                                ResourceType = r.ResourceType,
+                                ResourceFhirAccount = _publishEventsConfiguration.FhirAccount,
+                                ResourceFhirId = r.ResourceId,
+                                ResourceVersionId = r.ResourceVersion,
+                            }),
                         }).ToList();
 
                         await _eventSink.WriteAsync(events);
@@ -81,6 +96,10 @@ namespace Microsoft.Health.Fhir.Core.Features.Operations.PublishEvents
                 catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
                 {
                     // End the execution of the task
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error occurred on PublishEventsWorker.ExecuteAsync");
                 }
             }
         }
